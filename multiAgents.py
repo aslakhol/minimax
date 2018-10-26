@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -106,12 +106,13 @@ class MultiAgentSearchAgent(Agent):
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
 
+
 class MinimaxAgent(MultiAgentSearchAgent):
     """
       Your minimax agent (question 2)
     """
 
-    def getAction(self, gameState):
+    def getAction(self, state):
         """
           Returns the minimax action from the current gameState using self.depth
           and self.evaluationFunction.
@@ -128,8 +129,55 @@ class MinimaxAgent(MultiAgentSearchAgent):
           gameState.getNumAgents():
             Returns the total number of agents in the game
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        legalActions = state.getLegalActions()
+        bestAction = None
+        bestUtility = -(float("inf"))
+
+        for action in legalActions:
+            potentialState = state.generateSuccessor(self.index, action)
+            actionUtility = self.minimax(state=potentialState, depth=0, agentIndex=self.index)
+
+            if actionUtility > bestUtility:
+                bestUtility = actionUtility
+                bestAction = action
+
+        return bestAction
+
+    def minimax(self, state, depth, agentIndex):
+        numAgents = state.getNumAgents()
+        if self.isTerminalState(state=state, depth=depth):
+            return self.evaluationFunction(state)
+
+        if self.isPackman(agentIndex=agentIndex, state=state):
+            return self.maxValue(state=state, depth=depth, agentIndex=agentIndex % numAgents)
+
+        return self.minValue(state=state, depth=depth, agentIndex=agentIndex % numAgents)
+
+    def minValue(self, state, depth, agentIndex):
+        v = float("inf")
+
+        for action in state.getLegalActions(agentIndex):
+            nextState = state.generateSuccessor(agentIndex, action)
+            v = min(v, self.minimax(state=nextState, depth=depth + 1, agentIndex=agentIndex + 1))
+
+        return v
+
+    def maxValue(self, state, depth, agentIndex):
+        v = -(float("inf"))
+
+        for action in state.getLegalActions(agentIndex):
+            nextState = state.generateSuccessor(agentIndex, action)
+            v = max(v, self.minimax(state=nextState, depth=depth + 1, agentIndex=agentIndex + 1))
+
+        return v
+
+    def isTerminalState(self, state, depth):
+        return state.isWin() or state.isLose() or depth == self.depth
+
+    def isPackman(self, agentIndex, state):
+        return agentIndex % state.getNumAgents() == 0
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -170,4 +218,3 @@ def betterEvaluationFunction(currentGameState):
 
 # Abbreviation
 better = betterEvaluationFunction
-
