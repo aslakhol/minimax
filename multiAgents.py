@@ -184,24 +184,75 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         return v
 
-    def isTerminalState(self, state, depth):
-        return state.isWin() or state.isLose() or depth == self.depth
-
-    def isPacman(self, agentIndex, state):
-        return agentIndex % state.getNumAgents() == 0
-
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
       Your minimax agent with alpha-beta pruning (question 3)
     """
 
-    def getAction(self, gameState):
-        """
-          Returns the minimax action using self.depth and self.evaluationFunction
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+    def getAction(self, state):
+        legalActions = state.getLegalActions()
+        bestAction = Directions.STOP
+        bestUtility = -(float("inf"))
+        alpha = -(float("inf"))
+        beta = float("inf")
+
+        for action in legalActions:
+            potentialState = state.generateSuccessor(self.index, action)
+            actionUtility = self.abMinimax(state=potentialState, depth=0, agentIndex=self.index + 1, alpha=alpha, beta=beta)
+
+            if actionUtility > beta:
+                return actionUtility
+            alpha = max(alpha, actionUtility)
+
+            if actionUtility > bestUtility:
+                bestUtility = actionUtility
+                bestAction = action
+
+        return bestAction
+
+    def abMinimax(self, state, depth, agentIndex, alpha, beta):
+        numAgents = state.getNumAgents()
+
+        if self.isTerminalState(state=state, depth=depth):
+            return self.evaluationFunction(state)
+
+        if self.isPacman(agentIndex=agentIndex, state=state):
+            return self.abMaxValue(state=state, depth=depth, agentIndex=agentIndex % numAgents, alpha=alpha, beta=beta)
+
+        return self.abMinValue(state=state, depth=depth, agentIndex=agentIndex % numAgents, alpha=alpha, beta=beta)
+
+    def abMinValue(self, state, depth, agentIndex, alpha, beta):
+        v = float("inf")
+
+        for action in state.getLegalActions(agentIndex):
+            nextState = state.generateSuccessor(agentIndex, action)
+
+            if self.isPacman(state=state, agentIndex=agentIndex + 1):
+                # If next agent is pacman, increase depth
+                v = min(v, self.abMinimax(state=nextState, depth=depth + 1, agentIndex=agentIndex + 1, alpha=alpha, beta=beta))
+            else:
+                v = min(v, self.abMinimax(state=nextState, depth=depth, agentIndex=agentIndex + 1, alpha=alpha, beta=beta))
+
+            if v < alpha:
+                return v
+
+            beta = min(beta, v)
+
+        return v
+
+    def abMaxValue(self, state, depth, agentIndex, alpha, beta):
+        v = -(float("inf"))
+
+        for action in state.getLegalActions(agentIndex):
+            nextState = state.generateSuccessor(agentIndex, action)
+            v = max(v, self.abMinimax(state=nextState, depth=depth, agentIndex=agentIndex + 1, alpha=alpha, beta=beta))
+            if v > beta:
+                return v
+            alpha = max(alpha, v)
+
+        return v
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
