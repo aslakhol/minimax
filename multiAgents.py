@@ -101,6 +101,12 @@ class MultiAgentSearchAgent(Agent):
       is another abstract class.
     """
 
+    def isTerminalState(self, state, depth):
+        return state.isWin() or state.isLose() or depth == self.depth
+
+    def isPacman(self, agentIndex, state):
+        return agentIndex % state.getNumAgents() == 0
+
     def __init__(self, evalFn = 'scoreEvaluationFunction', depth = '2'):
         self.index = 0 # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
