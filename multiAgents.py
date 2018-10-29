@@ -160,7 +160,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         for action in state.getLegalActions(agentIndex):
             nextState = state.generateSuccessor(agentIndex, action)
-            v = min(v, self.minimax(state=nextState, depth=depth + 1, agentIndex=agentIndex + 1))
+
+            if self.isPacman(state=state, agentIndex=agentIndex + 1):
+                v = min(v, self.minimax(state=nextState, depth=depth + 1, agentIndex=agentIndex + 1))
+            else:
+                v = min(v, self.minimax(state=nextState, depth=depth, agentIndex=agentIndex + 1))
 
         return v
 
