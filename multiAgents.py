@@ -162,6 +162,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
             nextState = state.generateSuccessor(agentIndex, action)
 
             if self.isPacman(state=state, agentIndex=agentIndex + 1):
+                # If next agent is pacman, increase depth
                 v = min(v, self.minimax(state=nextState, depth=depth + 1, agentIndex=agentIndex + 1))
             else:
                 v = min(v, self.minimax(state=nextState, depth=depth, agentIndex=agentIndex + 1))
