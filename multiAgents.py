@@ -131,7 +131,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
 
         legalActions = state.getLegalActions()
-        bestAction = None
+        bestAction = Directions.STOP
         bestUtility = -(float("inf"))
 
         for action in legalActions:
