@@ -136,7 +136,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         for action in legalActions:
             potentialState = state.generateSuccessor(self.index, action)
-            actionUtility = self.minimax(state=potentialState, depth=0, agentIndex=self.index)
+            actionUtility = self.minimax(state=potentialState, depth=0, agentIndex=self.index + 1)
 
             if actionUtility > bestUtility:
                 bestUtility = actionUtility
