@@ -146,10 +146,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
     def minimax(self, state, depth, agentIndex):
         numAgents = state.getNumAgents()
+
         if self.isTerminalState(state=state, depth=depth):
             return self.evaluationFunction(state)
 
-        if self.isPackman(agentIndex=agentIndex, state=state):
+        if self.isPacman(agentIndex=agentIndex, state=state):
             return self.maxValue(state=state, depth=depth, agentIndex=agentIndex % numAgents)
 
         return self.minValue(state=state, depth=depth, agentIndex=agentIndex % numAgents)
@@ -168,14 +169,14 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         for action in state.getLegalActions(agentIndex):
             nextState = state.generateSuccessor(agentIndex, action)
-            v = max(v, self.minimax(state=nextState, depth=depth + 1, agentIndex=agentIndex + 1))
+            v = max(v, self.minimax(state=nextState, depth=depth, agentIndex=agentIndex + 1))
 
         return v
 
     def isTerminalState(self, state, depth):
         return state.isWin() or state.isLose() or depth == self.depth
 
-    def isPackman(self, agentIndex, state):
+    def isPacman(self, agentIndex, state):
         return agentIndex % state.getNumAgents() == 0
 
 
